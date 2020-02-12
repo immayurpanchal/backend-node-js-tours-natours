@@ -6,6 +6,13 @@ const app = express();
 // Use of express.json() middleware
 app.use(express.json());
 
+// Create a custom middleware
+app.use((req, res, next) => {
+  // Middleware function by default get next as a third argument
+  console.log('Hello from Middleware');
+  next(); // Responsible to call next middleware
+});
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
