@@ -13,13 +13,21 @@ app.use((req, res, next) => {
   next(); // Responsible to call next middleware
 });
 
+app.use((req, res, next) => {
+  req.requestTime = new Date().toLocaleString();
+  next();
+});
+
 const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
 );
 
 const getAllTours = (req, res) => {
+  console.log(req.requestTime);
+
   res.status(200).json({
     status: 'success',
+    requestedAt: req.requestTime,
     results: tours.length,
     data: { tours: tours }
   });
