@@ -1,7 +1,12 @@
 const express = require('express');
 const fs = require('fs');
+const morgan = require('morgan');
 
 const app = express();
+
+// Use of morgan middleware
+// Provides Logging information of request(s) in terminal
+app.use(morgan('dev'));
 
 // Use of express.json() middleware
 app.use(express.json());
