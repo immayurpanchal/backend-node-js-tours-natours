@@ -7,7 +7,9 @@ const app = express();
 
 // Use of morgan middleware
 // Provides Logging information of request(s) in terminal
-app.use(morgan('dev'));
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+}
 
 // Use of express.json() middleware
 app.use(express.json());
