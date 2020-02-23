@@ -1,20 +1,4 @@
-const fs = require('fs');
-
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
-);
-
-exports.checkID = (req, res, next, value) => {
-  if (req.params.id * 1 > tours.length) {
-    console.log(`Tour id is : ${value}`);
-    return res.status(404).json({
-      // return statement required else express continues to execute further middlewares
-      status: 'fail',
-      message: 'Invalid ID'
-    });
-  }
-  next();
-};
+const tour = require('./../models/tourModel');
 
 // create a checkBody middleware
 // Check if the body contains the name and price property
@@ -35,50 +19,33 @@ exports.getAllTours = (req, res) => {
 
   res.status(200).json({
     status: 'success',
-    requestedAt: req.requestTime,
-    results: tours.length,
-    data: { tours: tours }
+    requestedAt: req.requestTime
+    // results: tours.length,
+    // data: { tours: tours }
   });
 };
 
 exports.getTour = (req, res) => {
   console.log(req.params);
   const id = req.params.id * 1;
-  const tour = tours.find(el => el.id === id);
+  // const tour = tours.find(el => el.id === id);
 
   res.status(200).json({
-    status: 'success',
-    data: { tour }
+    status: 'success'
+    // data: { tour }
   });
 };
 
 exports.createTour = (req, res) => {
   console.log(req.body);
-  const newId = tours[tours.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, req.body);
-
-  tours.push(newTour);
-
-  fs.writeFile(
-    `${__dirname}/dev-data/data/tours-simple.json`,
-    JSON.stringify(tours),
-    err => {
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newTour
-        }
-      }); // 201 = created
-    }
-  );
 };
 
 exports.updateTour = (req, res) => {
   res.status(200).json({
-    status: 'success',
-    data: {
-      tour: 'Update tour here...'
-    }
+    status: 'success'
+    // data: {
+    //   tour: 'Update tour here...'
+    // }
   });
 };
 
