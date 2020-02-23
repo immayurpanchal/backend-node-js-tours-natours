@@ -1,9 +1,12 @@
 const express = require('express');
+const dotenv = require('dotenv');
 const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
 const app = express();
+
+dotenv.config({ path: './config.env' });
 
 // Use of morgan middleware
 // Provides Logging information of request(s) in terminal
