@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const slugify = require('slugify');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -8,6 +9,7 @@ const tourSchema = new mongoose.Schema(
       unique: true,
       trim: true
     },
+    slug: String,
     duration: {
       type: Number,
       required: [true, 'A tour must have duration']
@@ -60,6 +62,25 @@ const tourSchema = new mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
+
+// DOCUMENT MIDDLEWARE
+// Runs before .save() and .create(). It doesn't work on .insertMany()
+// pre() and post() are called hooks.
+tourSchema.pre('save', function(next) {
+  console.log(this); // Show the current document object before Saving
+  this.slug = slugify(this.name, { lower: true });
+  next();
+});
+
+// tourSchema.pre('save', function(next) {
+//   console.log('Will Save the document...');
+//   next();
+// });
+
+// tourSchema.post('save', function(doc, next) {
+//   console.log(doc);
+//   next();
+// });
 
 // We can't use virtual property to Query because it doesn't exist in DB.
 tourSchema.virtual('durationWeeks').get(function() {
