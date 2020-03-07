@@ -54,7 +54,11 @@ const tourSchema = new mongoose.Schema(
       default: Date.now(),
       select: false
     },
-    startDates: [Date]
+    startDates: [Date],
+    secretTour: {
+      type: Boolean,
+      default: false
+    }
   },
   {
     // To view virtual properties, it must explicitely defined
@@ -66,26 +70,34 @@ const tourSchema = new mongoose.Schema(
 // DOCUMENT MIDDLEWARE
 // Runs before .save() and .create(). It doesn't work on .insertMany()
 // pre() and post() are called hooks.
-tourSchema.pre('save', function(next) {
+/* tourSchema.pre('save', function(next) {
   console.log(this); // Show the current document object before Saving
   this.slug = slugify(this.name, { lower: true });
   next();
+}); */
+
+/* tourSchema.pre('save', function(next) {
+  console.log('Will Save the document...');
+  next();
 });
 
-// tourSchema.pre('save', function(next) {
-//   console.log('Will Save the document...');
-//   next();
-// });
-
-// tourSchema.post('save', function(doc, next) {
-//   console.log(doc);
-//   next();
-// });
+tourSchema.post('save', function(doc, next) {
+  console.log(doc);
+  next();
+}); */
 
 // We can't use virtual property to Query because it doesn't exist in DB.
 tourSchema.virtual('durationWeeks').get(function() {
   // Using normal function because of this keyword
   return this.duration / 7;
+});
+
+// QUERY MIDDLEWARE
+tourSchema.pre(/^find/, function(next) {
+  /* this keyword now points at the current Query,
+  not the current document */
+  this.find({ secretTour: { $ne: true } });
+  next();
 });
 
 const Tour = mongoose.model('Tour', tourSchema);
