@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 const Tour = require('./../models/tourModel');
 const APIFeatures = require('../utils/apiFeatures');
 const catchAsync = require('../utils/catchAsync');
