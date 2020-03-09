@@ -1,4 +1,13 @@
 const mongoose = require('mongoose');
+
+process.on('uncaughtException', err => {
+  console.log(err.name, err.message);
+  console.log('Uncaught Exception 🔥 Shutting Down...!');
+  // Gracefully Shutting Down the server.
+  // Gracefully means Completing on going processes.
+  process.exit(1);
+});
+
 const app = require('./app');
 
 // console.log(process.env);
