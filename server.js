@@ -18,6 +18,16 @@ mongoose
 
 const port = process.env.PORT || 3000;
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`App running on ${port}`);
+});
+
+process.on('unhandledRejection', err => {
+  console.log(err.name, err.message);
+  console.log('Unhandler Rejection 🔥 Shutting Down...!');
+  // Gracefully Shutting Down the server.
+  // Gracefully means Completing on going processes.
+  server.close(() => {
+    process.exit(1);
+  });
 });
