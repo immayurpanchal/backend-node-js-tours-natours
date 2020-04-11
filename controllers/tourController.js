@@ -57,7 +57,10 @@ exports.createTour = catchAsync(async (req, res, next) => {
 
 exports.updateTour = catchAsync(async (req, res, next) => {
   // new: true will return the updated document
-  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, { new: true, runValidators: true });
+  const tour = await Tour.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true
+  });
 
   if (!tour) {
     return next(new AppError('No tour find with that ID', 404));
