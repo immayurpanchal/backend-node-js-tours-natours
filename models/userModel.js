@@ -18,7 +18,8 @@ const userSchema = mongoose.Schema({
   password: {
     type: String,
     required: [true, 'Provide a password'],
-    minlength: 8
+    minlength: 8,
+    select: false
   },
   passwordConfirm: {
     type: String,
@@ -44,6 +45,18 @@ userSchema.pre('save', async function(next) {
   this.passwordConfirm = undefined;
   next();
 });
+
+/* candidatePassword = pass123
+userPassword = encrypted(hashed) pass in the DB
+So, normal comparison won't work
+pass123 === $2a$12$92VZrtEGW/R7V5jB3viJKu/6o/28.KbB5EOf0ilObSse.fQISwvkq
+*/
+userSchema.methods.correctPassword = async function(
+  candidatePassword,
+  userPassword
+) {
+  return await bcrypt.compare(candidatePassword, userPassword);
+};
 
 const User = mongoose.model('User', userSchema);
 
