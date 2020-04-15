@@ -5,16 +5,27 @@ const AppError = require('./utils/appError');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const globalErrorHandler = require('./controllers/errorController');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 
 dotenv.config({ path: './config.env' });
 
+// 1) GLOBAL MIDDLEWARES
 // Use of morgan middleware
 // Provides Logging information of request(s) in terminal
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
+
+const limiter = rateLimit({
+  max: 100,
+  windowMs: 60 * 60 * 1000,
+  message: 'Too many request from this IP, Try again after an hour'
+});
+
+//
+app.use('/api', limiter);
 
 // Use of express.json() middleware
 app.use(express.json());
