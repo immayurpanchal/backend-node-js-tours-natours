@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
@@ -37,7 +38,9 @@ const userSchema = mongoose.Schema({
     type: String,
     enum: ['user', 'guide', 'lead-guide', 'admin'],
     default: 'user'
-  }
+  },
+  passwordResetToken: String,
+  passwordResetExpire: Date
 });
 
 userSchema.pre('save', async function(next) {
@@ -49,6 +52,14 @@ userSchema.pre('save', async function(next) {
 
   // Delete the passwordConfirm field
   this.passwordConfirm = undefined;
+  next();
+});
+
+userSchema.pre('save', async function(next) {
+  // Only run if password is actually modified
+  if (!this.isModified('password') || this.isNew) return next();
+
+  this.passwordChangedAt = Date.now() - 1000;
   next();
 });
 
@@ -77,6 +88,24 @@ userSchema.methods.changedPasswordAfter = function(JWTTimeStamp) {
   return false;
 };
 
+userSchema.methods.createPasswordResetToken = function() {
+  /* This token is sent to the user, only user will have to access this token */
+  /* Created a token like JWT, Not required too strong like password */
+  const resetToken = crypto.randomBytes(32).toString('hex');
+
+  /* Encrypt the token for security reasons else hacker can get the token and reset all the passwords */
+  this.passwordResetToken = crypto
+    .createHash('sha256')
+    .update(resetToken)
+    .digest('hex');
+
+  console.log({ resetToken }, this.passwordResetToken);
+
+  /* Set password expiry time to 10min only  */
+  this.passwordResetExpire = Date.now() + 10 * 60 * 1000; // 10min expire time
+
+  return resetToken;
+};
 const User = mongoose.model('User', userSchema);
 
 module.exports = User;
