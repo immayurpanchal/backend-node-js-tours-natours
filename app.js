@@ -7,6 +7,8 @@ const userRouter = require('./routes/userRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
 
 const app = express();
 
@@ -34,6 +36,12 @@ app.use('/api', limiter);
 // Body parser, reading data from body into req.body
 // Max limit to send data on the server is 10kb
 app.use(express.json({ limit: '10kb' }));
+
+// Data sanitization against NOSQL query injection
+app.use(mongoSanitize());
+
+// Data sanitization against XSS
+app.use(xss());
 
 // Serve static files
 app.use(express.static(`${__dirname}/public`));
