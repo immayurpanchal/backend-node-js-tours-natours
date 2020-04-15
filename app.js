@@ -9,6 +9,7 @@ const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
+const hpp = require('hpp'); // HTTP Parameter Pollution
 
 const app = express();
 
@@ -42,6 +43,25 @@ app.use(mongoSanitize());
 
 // Data sanitization against XSS
 app.use(xss());
+
+// Prevent Parameter Pollution
+/*
+{{URL}}api/v1/tours?sort=price&sort=duration
+Express will create an array of sort Query Params 
+and throw error because of our logic won't work there
+ */
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingAverage',
+      'ratingQuantity',
+      'maxGroupSize',
+      'difficulty',
+      'price'
+    ]
+  })
+);
 
 // Serve static files
 app.use(express.static(`${__dirname}/public`));
