@@ -40,7 +40,12 @@ const userSchema = mongoose.Schema({
     default: 'user'
   },
   passwordResetToken: String,
-  passwordResetExpire: Date
+  passwordResetExpire: Date,
+  active: {
+    type: Boolean,
+    default: true,
+    select: false
+  }
 });
 
 userSchema.pre('save', async function(next) {
@@ -63,6 +68,11 @@ userSchema.pre('save', async function(next) {
   next();
 });
 
+userSchema.pre(/^find/, function(next) {
+  // 'this' keyword points to current query
+  this.find({ active: { $ne: false } });
+  next();
+});
 /* candidatePassword = pass123
 userPassword = encrypted(hashed) pass in the DB
 So, normal comparison won't work
