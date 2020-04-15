@@ -6,12 +6,16 @@ const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const globalErrorHandler = require('./controllers/errorController');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const app = express();
 
 dotenv.config({ path: './config.env' });
 
 // 1) GLOBAL MIDDLEWARES
+// Set security http headers
+app.use(helmet());
+
 // Use of morgan middleware
 // Provides Logging information of request(s) in terminal
 if (process.env.NODE_ENV === 'development') {
@@ -24,11 +28,12 @@ const limiter = rateLimit({
   message: 'Too many request from this IP, Try again after an hour'
 });
 
-//
+// Limit the API call from same IP
 app.use('/api', limiter);
 
-// Use of express.json() middleware
-app.use(express.json());
+// Body parser, reading data from body into req.body
+// Max limit to send data on the server is 10kb
+app.use(express.json({ limit: '10kb' }));
 
 // Serve static files
 app.use(express.static(`${__dirname}/public`));
