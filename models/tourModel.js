@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const User = require('../models/userModel');
 // const validator = require('validator');
 // const slugify = require('slugify');
 
@@ -77,7 +78,32 @@ const tourSchema = new mongoose.Schema(
     secretTour: {
       type: Boolean,
       default: false
-    }
+    },
+    startLocation: {
+      //GeoJSON - Below
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point']
+      },
+      coordinates: [Number],
+      address: String,
+      description: String
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point']
+        },
+        coordinates: [Number],
+        address: String,
+        description: String,
+        day: Number // Day of the tour on which people will go to that location
+      }
+    ],
+    guides: Array
   },
   {
     // To view virtual properties, it must explicitely defined
@@ -104,6 +130,16 @@ tourSchema.post('save', function(doc, next) {
   console.log(doc);
   next();
 }); */
+
+tourSchema.pre('save', async function(next) {
+  /* 
+  guides will become an Array of promises as .map() 
+  contains async function which returns promoise 
+  */
+  const guidesPromises = this.guides.map(async id => await User.findById(id));
+  this.guides = await Promise.all(guidesPromises);
+  next();
+});
 
 // We can't use virtual property to Query because it doesn't exist in DB.
 tourSchema.virtual('durationWeeks').get(function() {
