@@ -151,6 +151,13 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+// Virtual Populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // 'tour' key in reviewModel.js
+  localField: '_id'
+});
+
 // QUERY MIDDLEWARE
 tourSchema.pre(/^find/, function(next) {
   /* this keyword now points at the current Query,
