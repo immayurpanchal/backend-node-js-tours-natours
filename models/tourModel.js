@@ -117,6 +117,10 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// tourSchema.index({ price: 1 });
+tourSchema.index({ price: 1, ratingAverage: -1 });
+tourSchema.index({ slug: 1 });
+
 // DOCUMENT MIDDLEWARE
 // Runs before .save() and .create(). It doesn't work on .insertMany()
 // pre() and post() are called hooks.
