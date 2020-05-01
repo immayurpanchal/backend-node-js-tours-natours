@@ -41,7 +41,7 @@ exports.createOne = Model =>
     const document = await Model.create(req.body);
 
     res.status(201).json({
-      status: 'sucess',
+      status: 'success',
       data: {
         data: document
       }
