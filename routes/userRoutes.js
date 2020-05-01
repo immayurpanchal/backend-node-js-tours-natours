@@ -16,21 +16,30 @@ const {
   forgotPassword,
   resetPassword,
   protect,
-  updatePassword
+  updatePassword,
+  restrictTo
 } = require('../controllers/authController');
 
 // User Router
 const router = express.Router();
 
 // User Routes
-router.get('/me', protect, getMe, getUser);
 router.post('/signup', signup);
 router.post('/login', login);
 router.post('/forgotPassword', forgotPassword);
 router.patch('/resetPassword/:token', resetPassword);
-router.patch('/updateMyPassword', protect, updatePassword);
-router.patch('/updateMe', protect, updateMe);
-router.delete('/deleteMe', protect, deleteMe);
+
+// Below this middleware all the routes requires authentication
+// middleware runs in a sequence
+router.use(protect);
+
+router.patch('/updateMyPassword', updatePassword);
+router.get('/me', getMe, getUser);
+router.patch('/updateMe', updateMe);
+router.delete('/deleteMe', deleteMe);
+
+// Below this middlware only admin can access below routes
+router.use(restrictTo('admin'));
 
 router
   .route('/')
