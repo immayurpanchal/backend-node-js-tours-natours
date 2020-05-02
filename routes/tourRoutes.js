@@ -24,6 +24,16 @@ router
     tourController.getMonthlyPlan
   );
 
+/* 
+QueryString: /tours-within?distance=2000=&center=-40,45&unit=mi
+1. /tours-within/200/center/-40,45/unit/mi
+2. /tours-within/200/center/-40,45/unit/km
+*/
+
+router
+  .route('/tours-within/:distance/center/:latlng/unit/:unit')
+  .get(tourController.getToursWithin);
+
 router
   .route('/')
   .get(tourController.getAllTours)
