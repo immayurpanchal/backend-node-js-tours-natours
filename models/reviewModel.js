@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Tour = require('./tourModel');
 
-const reviewSchema = mongoose.Schema(
+const reviewSchema = new mongoose.Schema(
   {
     review: {
       type: String,
@@ -33,6 +33,8 @@ const reviewSchema = mongoose.Schema(
     toObject: { virtuals: true }
   }
 );
+
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });
 
 reviewSchema.pre(/^find/, function(next) {
   // this.populate({
