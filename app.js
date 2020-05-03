@@ -11,12 +11,14 @@ const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp'); // HTTP Parameter Pollution
-
+const cors = require('cors');
 const app = express();
 
 dotenv.config({ path: './config.env' });
 
 // 1) GLOBAL MIDDLEWARES
+app.use(cors());
+
 // Set security http headers
 app.use(helmet());
 
