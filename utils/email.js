@@ -1,28 +1,68 @@
 const nodemailer = require('nodemailer');
+const pug = require('pug');
+const htmlToText = require('html-to-text');
 
-const sendEmail = async options => {
-  // 1) Create a transpoter
-  const transpoter = nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port: process.env.EMAIL_PORT,
-    auth: {
-      user: process.env.EMAIL_USERNAME,
-      pass: process.env.EMAIL_PASSWORD
+module.exports = class Email {
+  constructor(user, url) {
+    this.to = user.email;
+    this.firstname = user.name.split(' ')[0];
+    this.url = url;
+    this.from = `Mayur Panchal <${process.env.EMAIL_FROM}>`;
+  }
+
+  newTransport() {
+    if (process.env.NODE_ENV === 'production') {
+      // sendgrid
+      return nodemailer.createTransport({
+        service: 'SendGrid',
+        auth: {
+          user: process.env.SENDGRID_USERNAME,
+          pass: process.env.SENDGRID_PASSWORD
+        }
+      });
     }
-    // Activate in gmail "less secure app" option
-  });
 
-  // 2) Define the email options
-  const mailOptions = {
-    from: 'Mayur Panchal <hello@mayur.io>',
-    to: options.email,
-    subject: options.subject,
-    text: options.message
-    // html:
-  };
+    return nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: process.env.EMAIL_PORT,
+      auth: {
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD
+      }
+      // Activate in gmail "less secure app" option
+    });
+  }
 
-  // 3) Actually send the email
-  await transpoter.sendMail(mailOptions);
+  async send(template, subject) {
+    // Send the actual email
+    // 1) Render HTML based on HTML
+    const html = pug.renderFile(`${__dirname}/../views/email/${template}.pug`, {
+      firstName: this.firstName,
+      url: this.url,
+      subject
+    });
+
+    // 2) Define the email options
+    const mailOptions = {
+      from: this.from,
+      to: this.to,
+      subject,
+      html,
+      text: htmlToText.fromString(html)
+    };
+
+    // 3) Create Transport and send email
+    await this.newTransport().sendMail(mailOptions);
+  }
+
+  async sendWelcome() {
+    await this.send('welcome', 'Welcome to natours family');
+  }
+
+  async sendPasswordReset() {
+    await this.send(
+      'passwordReset',
+      'Your Password reset token (Valid for 10mins)'
+    );
+  }
 };
-
-module.exports = sendEmail;
