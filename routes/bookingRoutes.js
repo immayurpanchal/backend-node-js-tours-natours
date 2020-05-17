@@ -2,14 +2,25 @@ const express = require('express');
 const bookingController = require('../controllers/bookingController');
 const authController = require('../controllers/authController');
 
-/* 
-mergeParams: true requires as to get the access of 
-tourId params in /:tourId/reviews path 
-*/
 const router = express.Router();
+
+router.use(authController.protect);
 
 router
   .route('/checkout-session/:tourId')
-  .get(authController.protect, bookingController.getCheckoutSession);
+  .get(bookingController.getCheckoutSession);
+
+router.use(authController.restrictTo('lead-guide', 'admin'));
+
+router
+  .route('/')
+  .get(bookingController.getAllBookings)
+  .post(bookingController.createBooking);
+
+router
+  .route('/:id')
+  .get(bookingController.getBooking)
+  .patch(bookingController.updateBooking)
+  .delete(bookingController.deleteBooking);
 
 module.exports = router;
