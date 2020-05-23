@@ -1,5 +1,4 @@
 const express = require('express');
-const dotenv = require('dotenv');
 const morgan = require('morgan');
 const AppError = require('./utils/appError');
 const tourRouter = require('./routes/tourRoutes');
@@ -14,8 +13,6 @@ const xss = require('xss-clean');
 const hpp = require('hpp'); // HTTP Parameter Pollution
 const cors = require('cors');
 const app = express();
-
-dotenv.config({ path: './config.env' });
 
 // 1) GLOBAL MIDDLEWARES
 app.use(cors());

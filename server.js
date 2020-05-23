@@ -1,4 +1,7 @@
 const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+
+dotenv.config({ path: './config.env' });
 
 process.on('uncaughtException', err => {
   console.log(err.name, err.message);
@@ -10,7 +13,7 @@ process.on('uncaughtException', err => {
 
 const app = require('./app');
 
-// console.log(process.env);
+// console.log(process.env.RAZORPAY_KEY);
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
@@ -28,7 +31,7 @@ mongoose
     console.log('Connection Successful');
   });
 
-const port = process.env.PORT || 8000;
+const port = process.env.PORT || 3000;
 
 const server = app.listen(port, () => {
   console.log(`App running on ${port}`);
