@@ -9,7 +9,7 @@ const bookingSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.ObjectId,
     ref: 'User',
-    required: [true, 'User must belong to a tour']
+    required: [true, 'Booking must belong to a user']
   },
   price: {
     type: Number,
@@ -22,6 +22,15 @@ const bookingSchema = new mongoose.Schema({
   paid: {
     type: Boolean,
     default: true
+  },
+  paymentId: {
+    type: String,
+    required: [true, 'Booking must have a paymentId']
+  },
+  orderId: { type: String, required: [true, 'Booking must have a orderId'] },
+  signature: {
+    type: String,
+    required: [true, 'Booking must have a signature ']
   }
 });
 
