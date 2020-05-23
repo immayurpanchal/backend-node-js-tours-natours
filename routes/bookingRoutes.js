@@ -10,11 +10,14 @@ router
   .route('/checkout-session/:tourId')
   .get(bookingController.getCheckoutSession);
 
-router.use(authController.restrictTo('lead-guide', 'admin'));
+// router.use(authController.restrictTo('lead-guide', 'admin'));
 
 router
   .route('/')
-  .get(bookingController.getAllBookings)
+  .get(
+    authController.restrictTo('lead-guide', 'admin'),
+    bookingController.getAllBookings
+  )
   .post(bookingController.createBooking);
 
 router
