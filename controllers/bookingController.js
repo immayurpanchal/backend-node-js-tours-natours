@@ -1,47 +1,38 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Tour = require('../models/tourModel');
 const Booking = require('../models/bookingModel');
 const catchAsync = require('../utils/catchAsync');
 const factory = require('../controllers/handlerFactory');
+const Razorpay = require('razorpay');
+const shortid = require('shortid');
+
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY,
+  key_secret: process.env.RAZORPAY_SECRET
+});
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the current book tour
   const tour = await Tour.findById(req.params.tourId);
 
+  if (!tour) {
+    res.status(404).json({
+      status: 'failed',
+      message: 'Invalid Tour'
+    });
+  }
+
   // 2) Create checkout session
-  const session = await stripe.checkout.sessions.create(
-    {
-      payment_method_types: ['card'],
-      /* success_url: `${req.protocol}://${req.get('host')}/?tour=${
-        req.params.tourId
-      }&user=${req.user.id}&price=${tour.price}`, */
-      success_url: `http://localhost:3000/?tour=${req.params.tourId}&user=${req.user.id}&price=${tour.price}`,
-      cancel_url: `${req.protocol}://${req.get('host')}/tour/${
-        req.params.tourId
-      }`,
-      customer_email: req.user.email,
-      // Custom fields: client_reference_id: allows to pass some data
-      // about the purchase of the data, we'll access the session object again
-      client_reference_id: req.params.tourId,
-      line_items: [
-        {
-          name: `${tour.name} Tour`,
-          description: tour.summary,
-          // images require from live server so we'll do it after deployment
-          images: [`https://www.natours.dev/img/tours/${tour.imageCover}`],
-          amount: tour.price * 100, // price is in cents
-          currency: 'inr',
-          quantity: 1
-        }
-      ]
-    },
-    { apiKey: process.env.STRIPE_SECRET_KEY }
-  );
+  const order = await razorpay.orders.create({
+    amount: (tour.price * 100).toString(),
+    currency: 'INR',
+    receipt: shortid.generate(),
+    payment_capture: 1
+  });
 
   // 3) Create session as response
   res.status(200).json({
     status: 'success',
-    session
+    order
   });
 });
 
