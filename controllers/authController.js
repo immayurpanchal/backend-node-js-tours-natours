@@ -48,8 +48,11 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 
   const url = `${req.protocol}://${req.get('host')}/me`;
-  await new Email(newUser, url).sendWelcome();
-  createAndSendToken(newUser, 201, res);
+  try {
+    await new Email(newUser, url).sendWelcome();
+  } catch (error) {
+    createAndSendToken(newUser, 201, res);
+  }
 });
 
 exports.login = catchAsync(async (req, res, next) => {
@@ -114,7 +117,6 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    console.log(req.user.role);
     // roles is an array
     // ['admin', 'lead-guide'] role='user'
     if (!roles.includes(req.user.role)) {
