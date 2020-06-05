@@ -12,6 +12,7 @@ const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp'); // HTTP Parameter Pollution
 const cors = require('cors');
+const compression = require('compression');
 const app = express();
 
 // 1) GLOBAL MIDDLEWARES
@@ -78,6 +79,8 @@ app.use((req, res, next) => {
   req.requestTime = new Date().toLocaleString();
   next();
 });
+
+app.use(compression());
 
 // Routers
 
